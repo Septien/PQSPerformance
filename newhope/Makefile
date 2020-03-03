@@ -21,5 +21,5 @@ libnewhope: newhopelib
 newhopelib: $(SOURCESLIB) $(HEADERS)
 	$(CC) $(FLAGSPIC) $(SOURCESLIB) -fpic
 
-clear:
+clean:
 	-rm PQCgenKAT_kem *.o
