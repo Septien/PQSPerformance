@@ -4,11 +4,16 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/types.h>
 
 #include "performance.h"
 
 // Crypto libraries
 #include "newhope/api.h"
+
+#ifdef RPI
+#define uint64_t u_int64_t
+#endif
 
 /*
 *   Comparison function.
@@ -23,10 +28,9 @@ int comp(const void *elem1, const void *elem2)
     return 0;
 }
 
-void testNewHope(int N, uint64_t *medians)
+void testNewHope(int N, uint64_t *medians, uint64_t *t_keygen, uint64_t *t_dec, uint64_t *t_enc)
 {
     // For measuring time
-    uint64_t t_keygen[N], t_enc[N], t_dec[N];
     int i;
 
     // For the scheme
@@ -53,18 +57,36 @@ void testNewHope(int N, uint64_t *medians)
     medians[2] = t_dec[(int)N/2];
 }
 
-void makeTest(int N, uint64_t *medians)
+void makeTest(int N, uint64_t *medians, uint64_t *keygen, uint64_t *dec, uint64_t *enc)
 {
-    testNewHope(N, medians);
+    testNewHope(N, medians, keygen, dec, enc);
 }
 
 int main(void)
 {
-    uint64_t *medians;
+    uint64_t *medians, *keygen, *enc, *dec;
+    int N = 2000;
     medians = (uint64_t *)malloc(3 * sizeof(uint64_t));
-    makeTest(1000, medians);
+    keygen = (uint64_t *)malloc(N * sizeof(uint64_t));
+    enc = (uint64_t *)malloc(N * sizeof(uint64_t));
+    dec = (uint64_t *)malloc(N * sizeof(uint64_t));
+    
+#ifdef RPI    
+    init_module();
+#endif
+
+    makeTest(2000, medians, keygen, dec, enc);
     printf("Median for the KeyGen function:\n\t%llu\n", medians[0]);
     printf("Median for the Enc function:\n\t%llu\n", medians[1]);
     printf("Median for the Dec function:\n\t%llu\n", medians[2]);
+
+    int i;
+    FILE *pfile;
+    pfile = fopen("timemeasure.csv", "w");
+    fprintf(pfile, "%llu, %llu, %llu\n", medians[0], medians[1], medians[2]);
+    for (int i = 0; i < N-1; i++)
+    {
+        fprintf(pfile, "%llu,%llu,%llu\n", keygen[i], enc[i], dec[i]);
+    }
     return 0;
 }
