@@ -26,29 +26,41 @@ FUNC rdtsc()
 #endif
 }
 
-uint64_t testKeyGen(int (*keygen)(unsigned char *, unsigned char*), unsigned char *pk, unsigned char *sk)
+void testKeyGen(int (*keygen)(unsigned char *, unsigned char*), unsigned char *pk, unsigned char *sk, struct values *keygenA)
 {
-    uint64_t low, high;
-    low = rdtsc();
+    double low, high;
+    struct timeval start, end;
+    gettimeofday(&start, NULL);
+    low = (double) rdtsc();
     keygen(pk, sk);
-    high = rdtsc();
-    return high - low;
+    high = (double) rdtsc();
+    gettimeofday(&end, NULL);
+    keygenA -> cycles = high - low;
+    keygenA -> time = (double) (end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec);
 }
 
-uint64_t testEnc(int (*enc)(unsigned char*, unsigned char*, const unsigned char*), unsigned char *ct, unsigned char *ss, unsigned char *pk)
+void testEnc(int (*enc)(unsigned char*, unsigned char*, const unsigned char*), unsigned char *ct, unsigned char *ss, unsigned char *pk, struct values *encA)
 {
-    uint64_t low, high;
-    low = rdtsc();
+    double low, high;
+    struct timeval start, end;
+    gettimeofday(&start, NULL);
+    low = (double) rdtsc();
     enc(ct, ss, pk);
-    high = rdtsc();
-    return high - low;
+    high = (double) rdtsc();
+    gettimeofday(&end, NULL);
+    encA -> cycles = high - low;
+    encA -> time = (double) (end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec);
 }
 
-uint64_t testDec(int (*dec)(unsigned char*, const unsigned char *, const unsigned char*), unsigned char *ss, unsigned char *ct, unsigned char *sk)
+void testDec(int (*dec)(unsigned char*, const unsigned char *, const unsigned char*), unsigned char *ss, unsigned char *ct, unsigned char *sk, struct values *decA)
 {
-    uint64_t low, high;
-    low = rdtsc();
+    double low, high;
+    struct timeval start, end;
+    gettimeofday(&start, NULL);
+    low = (double) rdtsc();
     dec(ss, ct, sk);
-    high = rdtsc();
-    return high - low;
+    high = (double) rdtsc();
+    gettimeofday(&end, NULL);
+    decA -> cycles = high - low;
+    decA -> time = (double) (end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec);
 }
