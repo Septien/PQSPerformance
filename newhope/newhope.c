@@ -1,7 +1,6 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "newhope.h"
 #include "api.h"
 #include "rng.h"
 #include "cpapke.h"
