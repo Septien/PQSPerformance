@@ -1,3 +1,4 @@
 test
 *.dylib
 .DS_Store
+*.so
