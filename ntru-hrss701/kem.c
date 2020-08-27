@@ -5,7 +5,7 @@
 #include "owcpa.h"
 
 // API FUNCTIONS 
-int crypto_kem_keypairNTRU(unsigned char *pk, unsigned char *sk)
+int crypto_kem_keypair(unsigned char *pk, unsigned char *sk)
 {
   unsigned char seed[NTRU_SAMPLE_FG_BYTES];
 
@@ -17,7 +17,7 @@ int crypto_kem_keypairNTRU(unsigned char *pk, unsigned char *sk)
   return 0;
 }
 
-int crypto_kem_encNTRU(unsigned char *c, unsigned char *k, const unsigned char *pk)
+int crypto_kem_enc(unsigned char *c, unsigned char *k, const unsigned char *pk)
 {
   unsigned char rm[NTRU_OWCPA_MSGBYTES];
   unsigned char rm_seed[NTRU_SAMPLE_RM_BYTES];
@@ -32,7 +32,7 @@ int crypto_kem_encNTRU(unsigned char *c, unsigned char *k, const unsigned char *
   return 0;
 }
 
-int crypto_kem_decNTRU(unsigned char *k, const unsigned char *c, const unsigned char *sk)
+int crypto_kem_dec(unsigned char *k, const unsigned char *c, const unsigned char *sk)
 {
   int i, fail;
   unsigned char rm[NTRU_OWCPA_MSGBYTES];
