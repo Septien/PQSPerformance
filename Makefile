@@ -36,10 +36,16 @@ ifdef FRODO
 endif
 LIBFLAGS += -lcrypto
 
+DEBUGF=
+ifdef MEMORY
+	DEBUGF = -g
+	CFLAGS += -DMEMORY
+endif
+
 $( info $(LIBFLAGS) )
 
 test: $(SOURCES) $(HEADERS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(SOURCES) -o $@ $(LIBFLAGS) $(PERFFLAGS)
+	$(CC) $(DEBUGF) $(CFLAGS) $(LDFLAGS) $(SOURCES) -o $@ $(LIBFLAGS) $(PERFFLAGS)
 
 clean:
 	rm test

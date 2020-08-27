@@ -56,144 +56,55 @@ void computeMean(int N, struct values **means, struct values **keygen, struct va
     means[2]->time /= N;
 }
 
-#ifdef NTRU
-void testNTRU(int N, struct values **means, struct values **keygen, struct values **dec, struct values **enc)
+void testKEM(int N, struct values **means, struct values **keygen, struct values **dec, struct values **enc)
 {
     // For measuring time
     int i;
+
+    struct values *keygenA = NULL, *encA = NULL, *decA = NULL;
 
     // For the scheme
     unsigned char pk[CRYPTO_PUBLICKEYBYTES], sk[CRYPTO_SECRETKEYBYTES], ss[CRYPTO_BYTES], ct[CRYPTO_CIPHERTEXTBYTES];
 
        for (i = 0; i < N; i++)
     {
+#ifndef MEMORY
+        keygenA = keygen[i];
+        encA = enc[i];
+        decA = dec[i];
+#endif
         // Key generation
-        testKeyGen(crypto_kem_keypair, pk, sk, keygen[i]);
+        testKeyGen(crypto_kem_keypair, pk, sk, keygenA);
         // Encapsulation
-        testEnc(crypto_kem_enc, ct, ss, pk, enc[i]);
+        testEnc(crypto_kem_enc, ct, ss, pk, encA);
         // Decapsulation
-        testDec(crypto_kem_dec, ss, ct, sk, dec[i]);
+        testDec(crypto_kem_dec, ss, ct, sk, decA);
     }
 
+#ifndef MEMORY
     computeMean(N, means, keygen, dec, enc);
-}
 #endif
-
-#ifdef NTRUP
-void testNTRUprime(int N, struct values **means, struct values **keygen, struct values **dec, struct values **enc)
-{
-    // For measuring time
-    int i;
-
-    // For the scheme
-    unsigned char pk[CRYPTO_PUBLICKEYBYTES], sk[CRYPTO_SECRETKEYBYTES], ss[CRYPTO_BYTES], ct[CRYPTO_CIPHERTEXTBYTES];
-
-       for (i = 0; i < N; i++)
-    {
-        // Key generation
-        testKeyGen(crypto_kem_keypair, pk, sk, keygen[i]);
-        // Encapsulation
-        testEnc(crypto_kem_enc, ct, ss, pk, enc[i]);
-        // Decapsulation
-        testDec(crypto_kem_dec, ss, ct, sk, dec[i]);
-    }
-
-    computeMean(N, means, keygen, dec, enc);
 }
-#endif
-
-#ifdef SABER
-void testSaber(int N, struct values **means, struct values **keygen, struct values **dec, struct values **enc)
-{
-    // For measuring time
-    int i;
-
-    unsigned char pk[CRYPTO_PUBLICKEYBYTES], sk[CRYPTO_SECRETKEYBYTES], ss[CRYPTO_BYTES], ct[CRYPTO_CIPHERTEXTBYTES];
-    for (i = 0; i < N; i++)
-    {
-        // Key generation
-        testKeyGen(crypto_kem_keypair, pk, sk, keygen[i]);
-        // Encapsulation
-        testEnc(crypto_kem_enc, ct, ss, pk, enc[i]);
-        // Decapsulation
-        testDec(crypto_kem_dec, ss, ct, sk, dec[i]);
-    }
-
-    computeMean(N, means, keygen, dec, enc);
-}
-#endif
-
-#ifdef KYBER
-void testKyber(int N, struct values **means, struct values **keygen, struct values **dec, struct values **enc)
-{
-    // For measuring time
-    int i;
-
-    unsigned char pk[CRYPTO_PUBLICKEYBYTES], sk[CRYPTO_SECRETKEYBYTES], ss[CRYPTO_BYTES], ct[CRYPTO_CIPHERTEXTBYTES];
-    for (i = 0; i < N; i++)
-    {
-        // Key generation
-        testKeyGen(crypto_kem_keypair, pk, sk, keygen[i]);
-        // Encapsulation
-        testEnc(crypto_kem_enc, ct, ss, pk, enc[i]);
-        // Decapsulation
-        testDec(crypto_kem_dec, ss, ct, sk, dec[i]);
-    }
-
-    computeMean(N, means, keygen, dec, enc);
-}
-#endif
-
-#ifdef FRODO
-void testFK(int N, struct values **means, struct values **keygen, struct values **dec, struct values **enc)
-{
-    // For measuring time
-    int i;
-
-    unsigned char pk[CRYPTO_PUBLICKEYBYTES], sk[CRYPTO_SECRETKEYBYTES], ss[CRYPTO_BYTES], ct[CRYPTO_CIPHERTEXTBYTES];
-    for (i = 0; i < N; i++)
-    {
-        // Key generation
-        testKeyGen(crypto_kem_keypair, pk, sk, keygen[i]);
-        // Encapsulation
-        testEnc(crypto_kem_enc, ct, ss, pk, enc[i]);
-        // Decapsulation
-        testDec(crypto_kem_dec, ss, ct, sk, dec[i]);
-    }
-
-    computeMean(N, means, keygen, dec, enc);
-}
-#endif
 
 void makeTest(int N, struct values **means, struct values **keygen, struct values **dec, struct values **enc)
 {
-#ifdef NTRU
-    testNTRU(N, means, keygen, dec, enc);
-#endif
-#ifdef NTRUP
-    testNTRUprime(N, means, keygen, dec, enc);
-#endif
-#ifdef SABER
-    testSaber(N, means, keygen, dec, enc);
-#endif
-#ifdef KYBER
-    testKyber(N, means, keygen, dec, enc);
-#endif
-#ifdef FRODO
-    testFK(N, means, keygen, dec, enc);
-#endif
+    testKEM(N, means, keygen, dec, enc);
 }
 
 int main(int argc, char **argv)
 {
+#ifndef MEMORY
     if (argc < 2)
     {
         printf("Provide the name for the output file: output.csv\n");
         return 0;
     }
+#endif
 
     struct values **keygen, **enc, **dec, **means;
     int N = 2000, i, j;
+
+#ifndef MEMORY
     keygen = (struct values **)malloc(N * sizeof(struct values *));
     enc = (struct values **)malloc(N * sizeof(struct values *));
     dec = (struct values **)malloc(N * sizeof(struct values *));
@@ -209,6 +120,7 @@ int main(int argc, char **argv)
     means[0] = (struct values *)malloc(sizeof(struct values));
     means[1] = (struct values *)malloc(sizeof(struct values));
     means[2] = (struct values *)malloc(sizeof(struct values));
+#endif
 
 #ifdef RPI    
     init_module();
@@ -216,6 +128,7 @@ int main(int argc, char **argv)
 
     makeTest(2000, means, keygen, dec, enc);
 
+#ifndef MEMORY
     printf("Mean for the KeyGen function:\n\t%f\t%f\n", means[0]->cycles, means[0]->time);
     printf("Mean for the Enc function:\n\t%f\t%f\n", means[1]->cycles, means[1]->time);
     printf("Mean for the Dec function:\n\t%f\t%f\n", means[2]->cycles, means[2]->time);
@@ -228,5 +141,6 @@ int main(int argc, char **argv)
     {
         fprintf(pfile, "%f, %f, %f, %f, %f, %f\n", keygen[i]->time, enc[i]->time, dec[i]->time, keygen[i]->cycles, enc[i]->cycles, dec[i]->cycles);
     }
+#endif
     return 0;
 }

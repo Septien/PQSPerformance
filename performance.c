@@ -35,8 +35,10 @@ void testKeyGen(int (*keygen)(unsigned char *, unsigned char*), unsigned char *p
     keygen(pk, sk);
     high = (double) rdtsc();
     gettimeofday(&end, NULL);
+#ifndef MEMORY
     keygenA -> cycles = high - low;
     keygenA -> time = (double) (end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec);
+#endif
 }
 
 void testEnc(int (*enc)(unsigned char*, unsigned char*, const unsigned char*), unsigned char *ct, unsigned char *ss, unsigned char *pk, struct values *encA)
@@ -48,8 +50,10 @@ void testEnc(int (*enc)(unsigned char*, unsigned char*, const unsigned char*), u
     enc(ct, ss, pk);
     high = (double) rdtsc();
     gettimeofday(&end, NULL);
+#ifndef MEMORY
     encA -> cycles = high - low;
     encA -> time = (double) (end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec);
+#endif
 }
 
 void testDec(int (*dec)(unsigned char*, const unsigned char *, const unsigned char*), unsigned char *ss, unsigned char *ct, unsigned char *sk, struct values *decA)
@@ -61,6 +65,8 @@ void testDec(int (*dec)(unsigned char*, const unsigned char *, const unsigned ch
     dec(ss, ct, sk);
     high = (double) rdtsc();
     gettimeofday(&end, NULL);
+#ifndef MEMORY
     decA -> cycles = high - low;
     decA -> time = (double) (end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec);
+#endif
 }
