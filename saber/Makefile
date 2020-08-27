@@ -13,7 +13,7 @@ libsaber: saberlib
 	$(AR) libsaber.a *.o
 
 saberlib: $(SOURCESLIB) $(HEADERS)
-	$(CC) $(FLAGSPIC) $(SOURCESLIB) -fPIC
+	$(CC) $(FLAGSPIC) $(SOURCESLIB)
 
 clean:
 	-rm *.o
