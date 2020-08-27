@@ -3,9 +3,9 @@
 
 #include "crypto_kem_ntrulpr653.h"
 
-#define crypto_kem_keypairNTRUP crypto_kem_ntrulpr653_keypair
-#define crypto_kem_encNTRUP crypto_kem_ntrulpr653_enc
-#define crypto_kem_decNTRUP crypto_kem_ntrulpr653_dec
+#define crypto_kem_keypair crypto_kem_ntrulpr653_keypair
+#define crypto_kem_enc crypto_kem_ntrulpr653_enc
+#define crypto_kem_dec crypto_kem_ntrulpr653_dec
 #define crypto_kem_PUBLICKEYBYTES crypto_kem_ntrulpr653_PUBLICKEYBYTES
 #define crypto_kem_SECRETKEYBYTES crypto_kem_ntrulpr653_SECRETKEYBYTES
 #define crypto_kem_BYTES crypto_kem_ntrulpr653_BYTES
