@@ -3,3 +3,9 @@ test
 .DS_Store
 *.so
 *.csv
+*.o
+*.a
+*.tr
+*.out
+*.map
+*.txt
