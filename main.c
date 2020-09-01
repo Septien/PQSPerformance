@@ -102,9 +102,13 @@ int main(int argc, char **argv)
 #endif
 
     struct values **keygen, **enc, **dec, **means;
-    int N = 2000, i, j;
+    int N = 1, i, j;
+    int m[1000];
+    for (i = 0; i < 1000; i++)
+        m[i] = i;
 
 #ifndef MEMORY
+    N = 2000;
     keygen = (struct values **)malloc(N * sizeof(struct values *));
     enc = (struct values **)malloc(N * sizeof(struct values *));
     dec = (struct values **)malloc(N * sizeof(struct values *));
@@ -126,7 +130,7 @@ int main(int argc, char **argv)
     init_module();
 #endif
 
-    makeTest(2000, means, keygen, dec, enc);
+    makeTest(N, means, keygen, dec, enc);
 
 #ifndef MEMORY
     printf("Mean for the KeyGen function:\n\t%f\t%f\n", means[0]->cycles, means[0]->time);
