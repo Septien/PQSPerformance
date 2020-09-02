@@ -37,8 +37,11 @@ endif
 LIBFLAGS += -lcrypto
 
 DEBUGF=
-ifdef MEMORY
+ifdef DEBUG
 	DEBUGF = -g
+endif
+
+ifdef MEMORY
 	CFLAGS += -DMEMORY
 endif
 
