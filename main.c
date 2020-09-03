@@ -6,8 +6,6 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-#include "performance.h"
-
 // Crypto libraries
 #ifdef NTRU
 #include "ntru-hrss701/api.h"
@@ -29,6 +27,8 @@
 #ifdef FRODO
 #include "FrodoKEM-640/api.h"
 #endif
+
+#include "performance.h"
 
 #ifdef RPI
 #define uint64_t u_int64_t
@@ -56,55 +56,99 @@ void computeMean(int N, struct values **means, struct values **keygen, struct va
     means[2]->time /= N;
 }
 
-void testKEM(int N, struct values **means, struct values **keygen, struct values **dec, struct values **enc)
+void measureTimeKEM(int N, struct values **means, struct values **keygen, struct values **dec, struct values **enc)
 {
     // For measuring time
     int i;
-
-    struct values *keygenA = NULL, *encA = NULL, *decA = NULL;
 
     // For the scheme
     unsigned char pk[CRYPTO_PUBLICKEYBYTES], sk[CRYPTO_SECRETKEYBYTES], ss[CRYPTO_BYTES], ct[CRYPTO_CIPHERTEXTBYTES];
 
        for (i = 0; i < N; i++)
     {
-#ifndef MEMORY
-        keygenA = keygen[i];
-        encA = enc[i];
-        decA = dec[i];
-#endif
         // Key generation
-        testKeyGen(crypto_kem_keypair, pk, sk, keygenA);
+        testKeyGen(crypto_kem_keypair, pk, sk, keygen[i]);
         // Encapsulation
-        testEnc(crypto_kem_enc, ct, ss, pk, encA);
+        testEnc(crypto_kem_enc, ct, ss, pk, enc[i]);
         // Decapsulation
-        testDec(crypto_kem_dec, ss, ct, sk, decA);
+        testDec(crypto_kem_dec, ss, ct, sk, dec[i]);
     }
 
-#ifndef MEMORY
     computeMean(N, means, keygen, dec, enc);
-#endif
 }
 
-void makeTest(int N, struct values **means, struct values **keygen, struct values **dec, struct values **enc)
+void measureMemoryKeyGen(char *file)
 {
-    testKEM(N, means, keygen, dec, enc);
+    unsigned char pk[CRYPTO_PUBLICKEYBYTES], sk[CRYPTO_SECRETKEYBYTES];
+    // Key generation
+    testKeyGen(crypto_kem_keypair, pk, sk, NULL);
+
+    FILE *fd;
+    fd = fopen(file, "w");
+    fprintf(fd, "%s\n%s\n", pk, sk);
+    fclose(fd);
+}
+
+void measureMemoryEnc(char *file)
+{
+    unsigned char pk[CRYPTO_PUBLICKEYBYTES], ss[CRYPTO_BYTES], ct[CRYPTO_CIPHERTEXTBYTES];
+    FILE *fd;
+    fd = fopen(file, "rw");
+    fscanf(fd, "%s", pk);
+    testEnc(crypto_kem_enc, ct, ss, pk, NULL);
+    fprintf(fd, "%s\n", ct);
+    fclose(fd);
+}
+
+void measureMemoryDec(char *file)
+{
+    unsigned char pk[CRYPTO_PUBLICKEYBYTES], sk[CRYPTO_SECRETKEYBYTES], ss[CRYPTO_BYTES], ct[CRYPTO_CIPHERTEXTBYTES];
+    FILE *fd;
+    fd = fopen(file, "r");
+    fscanf(fd, "%s", pk);
+    fscanf(fd, "%s", sk);
+    fscanf(fd, "%s", ct);
+    testDec(crypto_kem_dec, ss, ct, sk, NULL);
+    fclose(fd);
+}
+
+
+void makeTest(int N, struct values **means, struct values **keygen, struct values **dec, struct values **enc, char *file)
+{
+#ifdef TIME
+    measureTimeKEM(N, means, keygen, dec, enc);
+#endif
+#ifdef MEMORY
+    #ifdef KEYGEN
+        measureMemoryKeyGen(file);
+    #elif ENC
+        measureMemoryEnc(file);
+    #elif DEC
+        measureMemoryDec(file);
+    #else // All
+        measureMemoryKeyGen(file);
+        measureMemoryEnc(file);
+        measureMemoryDec(file);
+    #endif
+#endif
 }
 
 int main(int argc, char **argv)
 {
-#ifndef MEMORY
     if (argc < 2)
     {
+#ifdef TIME
         printf("Provide the name for the output file: output.csv\n");
+#elif MEMORY
+        printf("Provide the name for the keys file: keys.txt\n");
+#endif
         return 0;
     }
-#endif
 
     struct values **keygen, **enc, **dec, **means;
     int N = 1, i, j;
 
-#ifndef MEMORY
+#ifdef TIME
     N = 2000;
     keygen = (struct values **)malloc(N * sizeof(struct values *));
     enc = (struct values **)malloc(N * sizeof(struct values *));
@@ -127,9 +171,9 @@ int main(int argc, char **argv)
     init_module();
 #endif
 
-    makeTest(N, means, keygen, dec, enc);
+    makeTest(N, means, keygen, dec, enc, argv[2]);
 
-#ifndef MEMORY
+#ifdef TIME
     printf("Mean for the KeyGen function:\n\t%f\t%f\n", means[0]->cycles, means[0]->time);
     printf("Mean for the Enc function:\n\t%f\t%f\n", means[1]->cycles, means[1]->time);
     printf("Mean for the Dec function:\n\t%f\t%f\n", means[2]->cycles, means[2]->time);

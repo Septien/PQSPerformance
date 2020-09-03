@@ -41,8 +41,21 @@ ifdef DEBUG
 	DEBUGF = -g
 endif
 
+ifdef TIME
+	CFLAGS += -DTIME
+endif
+
 ifdef MEMORY
 	CFLAGS += -DMEMORY
+	ifdef KEYGEN
+		CFLAGS += -DKEYGEN
+	endif
+	ifdef ENC
+		CFLAGS += -DENC
+	endif
+	ifdef DEC
+		CFLAGS += -DDEC
+	endif
 endif
 
 $( info $(LIBFLAGS) )
