@@ -96,19 +96,41 @@ def getMemoryUsageMax():
         memUsageAll.append(memUsage.copy())
     return memUsageAll
 
-def saveData(data, file, delimiter):
-    m = np.array(data)
+def getMemoryUsageKEM():
+    """
+    Get the data of memory usage per KEM, all the operations
+    """
+    # For each kem
+    totalValues = []
+    for i in range(4):
+        fileN = memory + massiffile[i] + "_0" + ext
+        values = []
+        print(fileN)
+        with open(fileN, "r") as file:
+            readThreeLines(file)
+            for line in file:
+                if line[0] == "#":
+                    readThreeLines(file)
+                    total = getTotalMemory(file)
+                    values.append(total)
+        totalValues.append(values.copy())
+    return totalValues
+
+def saveData(data, file, delimiter, op=True):
+    m = np.array(data, dtype=object)
     mT = m.transpose()
     with open(file, "w") as csvfile:
         writer = csv.writer(csvfile, delimiter=delimiter)
         cipherS = [c.split("=")[0] for c in ciphers]
         writer.writerow(cipherS)
-        operationS = [c.split("=")[0] for c in operation]
-        writer.writerow(operationS)
+        if op:
+            operationS = [c.split("=")[0] for c in operation]
+            writer.writerow(operationS)
         writer.writerows(mT)
 
 if __name__ == '__main__':
     #measureMemory()
-    m = getMemoryUsageMax()
+    #m = getMemoryUsageMax()
+    m = getMemoryUsageKEM()
+    saveData(m, "memoryPerformance3.csv", ",", False)
     print(m)
-    #saveData(m, "memoryPerformance2.csv", ",")
