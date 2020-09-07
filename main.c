@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
 
 // Crypto libraries
@@ -85,6 +86,7 @@ void measureMemoryKeyGen(char *file)
 
     FILE *fd;
     fd = fopen(file, "w");
+    printf("%s", pk);
     fprintf(fd, "%s\n%s\n", pk, sk);
     fclose(fd);
 }
@@ -139,14 +141,19 @@ int main(int argc, char **argv)
     {
 #ifdef TIME
         printf("Provide the name for the output file: output.csv\n");
-#elif MEMORY
-        printf("Provide the name for the keys file: keys.txt\n");
 #endif
         return 0;
     }
 
     struct values **keygen, **enc, **dec, **means;
     int N = 1, i, j;
+    char *file = NULL;
+
+#ifdef MEMORY
+    file = (char *) malloc (8 * sizeof(char));
+    memcpy(file, "keys.txt", 8);
+    printf("%s", file);
+#endif
 
 #ifdef TIME
     N = 2000;
@@ -171,7 +178,7 @@ int main(int argc, char **argv)
     init_module();
 #endif
 
-    makeTest(N, means, keygen, dec, enc, argv[2]);
+    makeTest(N, means, keygen, dec, enc, file);
 
 #ifdef TIME
     printf("Mean for the KeyGen function:\n\t%f\t%f\n", means[0]->cycles, means[0]->time);
@@ -186,6 +193,9 @@ int main(int argc, char **argv)
     {
         fprintf(pfile, "%f, %f, %f, %f, %f, %f\n", keygen[i]->time, enc[i]->time, dec[i]->time, keygen[i]->cycles, enc[i]->cycles, dec[i]->cycles);
     }
+#endif
+#ifdef MEMORY
+    free(file);
 #endif
     return 0;
 }

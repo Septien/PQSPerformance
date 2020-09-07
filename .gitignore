@@ -9,3 +9,4 @@ test
 *.out
 *.map
 *.txt
+/memory
