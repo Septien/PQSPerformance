@@ -15,7 +15,7 @@ ifdef NTRU
 	CFLAGS += -DNTRU
 endif
 ifdef NTRUP
-	LIBFLAGS += -lntru
+	LIBFLAGS += -lntrup
 	HEADERS += ntrulpr653/api.h ntrulpr653/crypto_kem.h
 	CFLAGS += -DNTRUP
 endif
