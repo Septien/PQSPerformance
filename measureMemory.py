@@ -2,29 +2,30 @@ import os
 import csv
 import numpy as np
 
-ciphers = ["NTRU=1", "SABER=1", "KYBER=1", "FRODO=1"]
-massiffile = ["ntru/ntru", "saber/saber", "kyber/kyber", "frodo/frodo"]
-operation = ["KEYGEN=1", "ENC=1", "DEC=1", "TOTAL=1"]
+folder = "memoryPerformance/"
+ciphers = ["NTRUP=1", "NTRU=1", "SABER=1", "KYBER=1", "FRODO=1"]
+massiffile = ["ntrup/ntrup", "ntru/ntru", "saber/saber", "kyber/kyber", "frodo/frodo"]
+operation = ["TOTAL=1", "KEYGEN=1", "ENC=1", "DEC=1"]
 ext = ".out"
-memory = "memory/"
 rm = "rm test"
 make = "make test "
 valgrind = "valgrind --tool=massif --stacks=yes --massif-out-file="
-N = 1
+N = 2000
 
 def measureMemory():
     # For each cipher, measure its memory consumption
-    for i in range(4):
+    for i in range(1):
         for j in range(N):
             # make with the memory option enabled, and desired operation
-            for k in range(4):
+            for k in range(1):
                 # Remove test binary
                 os.system(rm)
-                cmd = make + ciphers[i] + " MEMORY=1 DEBUG=1 " + operation[k]
+                cmd = make + "test " + ciphers[i] + " MEMORY=1 DEBUG=1 " + operation[k]
                 os.system(cmd)
 
                 # Profile memory with valgrind
-                cmd = valgrind + memory + massiffile[i] + "_" + operation[k].split("=")[0] + "_" + str(j) + ext + " ./test"
+                cmd = valgrind + folder + massiffile[i] + "_" + operation[k].split("=")[0] + "_" + str(j) + ext + " ./test"
+                print(cmd)
                 os.system(cmd)
 
 def readThreeLines(file):
@@ -47,7 +48,7 @@ def getMemoryUsageAll():
             # Get the maximum value for each iteration
             memUsage = []   # Stores the max values for all files
             for j in range(N):
-                fileN = memory + massiffile[i] + "_" + operation[k].split("=")[0] + "1_" + str(j) + ext
+                fileN = folder + massiffile[i] + "_" + operation[k].split("=")[0] + "1_" + str(j) + ext
                 print(fileN)
                 memUsageOp = []
                 with open(fileN, "r") as file:
@@ -102,8 +103,11 @@ def getMemoryUsageKEM():
     """
     # For each kem
     totalValues = []
-    for i in range(4):
-        fileN = memory + massiffile[i] + "_0" + ext
+    for i in range(5):
+        if i == 0:
+            fileN = folder + massiffile[i] + "_TOTAL_0" + ext
+        else:
+            fileN = folder + massiffile[i] + "_0" + ext
         values = []
         print(fileN)
         with open(fileN, "r") as file:
@@ -129,8 +133,6 @@ def saveData(data, file, delimiter, op=True):
         writer.writerows(mT)
 
 if __name__ == '__main__':
-    #measureMemory()
-    #m = getMemoryUsageMax()
+    measureMemory()
     m = getMemoryUsageKEM()
-    saveData(m, "memoryPerformance3.csv", ",", False)
-    print(m)
+    saveData(m, "memoryPerformance.csv", ",", False)
