@@ -10,3 +10,6 @@ test
 *.map
 *.txt
 /memory
+*.pcapng
+*.crt
+__pycache__/
