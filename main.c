@@ -149,32 +149,28 @@ int main(int argc, char **argv)
     FILE *pFile;
     pFile = fopen(argv[1], "w");
 
-    fprintf(pFile, "KeyGen (uS),");
+    fprintf(pFile, "KeyGen (uS), Enc (uS), Dec (uS)\n");
     for (i = 0; i < N - 1; i++)
         fprintf(pFile, "%f,", keygen[i]->time);
     fprintf(pFile, "\n");
 
-    fprintf(pFile, "Enc (uS),");
     for (i = 0; i < N - 1; i++)
         fprintf(pFile, "%f,", enc[i]->time);
     fprintf(pFile, "\n");
 
-    fprintf(pFile, "Dec (uS),");
     for (i = 0; i < N - 1; i++)
         fprintf(pFile, "%f,", dec[i]->time);
     fprintf(pFile, "\n");
 
-    fprintf(pFile, "KeyGen (cycles),");
+    fprintf(pFile, "KeyGen (cycles), Enc (cycles), Dec (cycles)\n");
     for (i = 0; i < N - 1; i++)
         fprintf(pFile, "%f,", keygen[i]->cycles);
     fprintf(pFile, "\n");
 
-    fprintf(pFile, "Enc (cycles),");
     for (i = 0; i < N - 1; i++)
         fprintf(pFile, "%f,", enc[i]->cycles);
     fprintf(pFile, "\n");
 
-    fprintf(pFile, "Dec (cycles),");
     for (i = 0; i < N - 1; i++)
         fprintf(pFile, "%f,", dec[i]->cycles);
     fprintf(pFile, "\n");
