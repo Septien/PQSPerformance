@@ -2,7 +2,6 @@ test
 *.dylib
 .DS_Store
 *.so
-*.csv
 *.o
 *.a
 *.tr
@@ -10,6 +9,5 @@ test
 *.map
 *.txt
 /memory
-*.pcapng
 *.crt
 __pycache__/
