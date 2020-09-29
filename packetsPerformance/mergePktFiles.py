@@ -41,7 +41,7 @@ def mergeFiles(outputfile, delimiter):
                 # Read all the file and the required data
                 data = []
                 for row in reader:
-                    r = row[4:]
+                    r = row[4:10] + row[11:]
                     data.append(r)
                 m = np.array(data, dtype=object)
                 mT = m.transpose()
