@@ -1,5 +1,5 @@
 /**
- * Performance test, using the number of cycles metric.
+ * Performance test, using the number of cycles and seconds metric.
 */
 
 #include <stdlib.h>
@@ -64,56 +64,27 @@ void measureTimeKEM(int N, struct values **means, struct values **keygen, struct
 
     // For the scheme
     unsigned char pk[CRYPTO_PUBLICKEYBYTES], sk[CRYPTO_SECRETKEYBYTES], ss[CRYPTO_BYTES], ct[CRYPTO_CIPHERTEXTBYTES];
+    struct values *keygenA = NULL, *encA = NULL, *decA = NULL;
 
-       for (i = 0; i < N; i++)
+    for (i = 0; i < N; i++)
     {
+#ifdef TIME
+        keygenA = keygen[i];
+        encA = enc[i];
+        decA = dec[i];
+#endif
         // Key generation
-        testKeyGen(crypto_kem_keypair, pk, sk, keygen[i]);
+        testKeyGen(crypto_kem_keypair, pk, sk, keygenA);
         // Encapsulation
-        testEnc(crypto_kem_enc, ct, ss, pk, enc[i]);
+        testEnc(crypto_kem_enc, ct, ss, pk, encA);
         // Decapsulation
-        testDec(crypto_kem_dec, ss, ct, sk, dec[i]);
+        testDec(crypto_kem_dec, ss, ct, sk, decA);
     }
 
+#ifdef TIME
     computeMean(N, means, keygen, dec, enc);
+#endif
 }
-
-void measureMemoryKeyGen(char *file)
-{
-    unsigned char pk[CRYPTO_PUBLICKEYBYTES], sk[CRYPTO_SECRETKEYBYTES];
-    // Key generation
-    testKeyGen(crypto_kem_keypair, pk, sk, NULL);
-
-    FILE *fd;
-    fd = fopen(file, "w");
-    printf("%s", pk);
-    fprintf(fd, "%s\n%s\n", pk, sk);
-    fclose(fd);
-}
-
-void measureMemoryEnc(char *file)
-{
-    unsigned char pk[CRYPTO_PUBLICKEYBYTES], ss[CRYPTO_BYTES], ct[CRYPTO_CIPHERTEXTBYTES];
-    FILE *fd;
-    fd = fopen(file, "rw");
-    fscanf(fd, "%s", pk);
-    testEnc(crypto_kem_enc, ct, ss, pk, NULL);
-    fprintf(fd, "%s\n", ct);
-    fclose(fd);
-}
-
-void measureMemoryDec(char *file)
-{
-    unsigned char pk[CRYPTO_PUBLICKEYBYTES], sk[CRYPTO_SECRETKEYBYTES], ss[CRYPTO_BYTES], ct[CRYPTO_CIPHERTEXTBYTES];
-    FILE *fd;
-    fd = fopen(file, "r");
-    fscanf(fd, "%s", pk);
-    fscanf(fd, "%s", sk);
-    fscanf(fd, "%s", ct);
-    testDec(crypto_kem_dec, ss, ct, sk, NULL);
-    fclose(fd);
-}
-
 
 void makeTest(int N, struct values **means, struct values **keygen, struct values **dec, struct values **enc, char *file)
 {
@@ -121,17 +92,7 @@ void makeTest(int N, struct values **means, struct values **keygen, struct value
     measureTimeKEM(N, means, keygen, dec, enc);
 #endif
 #ifdef MEMORY
-    #ifdef KEYGEN
-        measureMemoryKeyGen(file);
-    #elif ENC
-        measureMemoryEnc(file);
-    #elif DEC
-        measureMemoryDec(file);
-    #else // All
-        measureMemoryKeyGen(file);
-        measureMemoryEnc(file);
-        measureMemoryDec(file);
-    #endif
+    measureTimeKEM(N, NULL, NULL, NULL, NULL);
 #endif
 }
 
@@ -185,14 +146,49 @@ int main(int argc, char **argv)
     printf("Mean for the Enc function:\n\t%f\t%f\n", means[1]->cycles, means[1]->time);
     printf("Mean for the Dec function:\n\t%f\t%f\n", means[2]->cycles, means[2]->time);
 
-    FILE *pfile;
-    pfile = fopen(argv[1], "w");
-    fprintf(pfile, "KeyGen (uS), Enc (uS), Dec (uS), KeyGen (cycles), Enc (cycles), Dec (cycles)\n");
-    fprintf(pfile, "%f, %f, %f, %f, %f, %f\n", means[0]->time, means[1]->time, means[2]->time, means[0]->cycles, means[1]->cycles, means[2]->cycles);
-    for (int i = 0; i < N-1; i++)
+    FILE *pFile;
+    pFile = fopen(argv[1], "w");
+
+    fprintf(pFile, "KeyGen (uS),");
+    for (i = 0; i < N - 1; i++)
+        fprintf(pFile, "%f,", keygen[i]->time);
+    fprintf(pFile, "\n");
+
+    fprintf(pFile, "Enc (uS),");
+    for (i = 0; i < N - 1; i++)
+        fprintf(pFile, "%f,", enc[i]->time);
+    fprintf(pFile, "\n");
+
+    fprintf(pFile, "Dec (uS),");
+    for (i = 0; i < N - 1; i++)
+        fprintf(pFile, "%f,", dec[i]->time);
+    fprintf(pFile, "\n");
+
+    fprintf(pFile, "KeyGen (cycles),");
+    for (i = 0; i < N - 1; i++)
+        fprintf(pFile, "%f,", keygen[i]->cycles);
+    fprintf(pFile, "\n");
+
+    fprintf(pFile, "Enc (cycles),");
+    for (i = 0; i < N - 1; i++)
+        fprintf(pFile, "%f,", enc[i]->cycles);
+    fprintf(pFile, "\n");
+
+    fprintf(pFile, "Dec (cycles),");
+    for (i = 0; i < N - 1; i++)
+        fprintf(pFile, "%f,", dec[i]->cycles);
+    fprintf(pFile, "\n");
+
+    for (j = 0; j < N; j++)
     {
-        fprintf(pfile, "%f, %f, %f, %f, %f, %f\n", keygen[i]->time, enc[i]->time, dec[i]->time, keygen[i]->cycles, enc[i]->cycles, dec[i]->cycles);
+        free(keygen[j]);
+        free(enc[j]);
+        free(dec[j]);
     }
+    free(keygen);
+    free(enc);
+    free(dec);
+    fclose(pFile);
 #endif
 #ifdef MEMORY
     free(file);
