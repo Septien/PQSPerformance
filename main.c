@@ -152,28 +152,28 @@ int main(int argc, char **argv)
     fprintf(pFile, "KeyGen (uS), Enc (uS), Dec (uS)\n");
     for (i = 0; i < N - 1; i++)
         fprintf(pFile, "%f,", keygen[i]->time);
-    fprintf(pFile, "\n");
+    fprintf(pFile, "%f\n", keygen[N-1]->time);
 
     for (i = 0; i < N - 1; i++)
         fprintf(pFile, "%f,", enc[i]->time);
-    fprintf(pFile, "\n");
+    fprintf(pFile, "%f\n", enc[N-1]->time);
 
     for (i = 0; i < N - 1; i++)
         fprintf(pFile, "%f,", dec[i]->time);
-    fprintf(pFile, "\n");
+    fprintf(pFile, "%f\n", dec[N-1]->time);
 
     fprintf(pFile, "KeyGen (cycles), Enc (cycles), Dec (cycles)\n");
     for (i = 0; i < N - 1; i++)
         fprintf(pFile, "%f,", keygen[i]->cycles);
-    fprintf(pFile, "\n");
+    fprintf(pFile, "%f\n", keygen[N-1]->cycles);
 
     for (i = 0; i < N - 1; i++)
         fprintf(pFile, "%f,", enc[i]->cycles);
-    fprintf(pFile, "\n");
+    fprintf(pFile, "%f\n", enc[N-1]->cycles);
 
     for (i = 0; i < N - 1; i++)
         fprintf(pFile, "%f,", dec[i]->cycles);
-    fprintf(pFile, "\n");
+    fprintf(pFile, "%f\n", dec[N-1]->cycles);
 
     for (j = 0; j < N; j++)
     {
