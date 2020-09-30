@@ -8,7 +8,7 @@ def measurePerformance():
     For each cipher, execute the performances tests.
     """
     ciphers = ["NTRUP=1", "NTRU=1", "SABER=1", "KYBER=1", "FRODO=1"]
-    files = ["ntrulpr653", "ntruhrss701", "ligthsaber", "kyber512", "frodoKEM640"]
+    files = ["ntrulpr653", "ntruhps2048509", "ligthsaber", "kyber512", "frodoKEM640"]
     perf = "Performance.csv"
     folder = "CPUPerformance/"
     for i in range(len(ciphers)):
