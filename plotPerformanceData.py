@@ -55,11 +55,14 @@ def loadDataCPUPerformance(file, delimiter, nKEM):
         unit = r[0].split(" ")[1]
         for i in range(nKEM):
             # Get the name of the KEM
-            kem.append(next(reader))
+            kem.append(next(reader)[0])
             # Get the data
-            data.append(next(reader))
-            data.append(next(reader))
-            data.append(next(reader))
+            row = next(reader)
+            data.append([float(r) for r in row[:-1]])
+            row = next(reader)
+            data.append([float(r) for r in row[:-1]])
+            row = next(reader)
+            data.append([float(r) for r in row[:-1]])
     return fields, unit, kem, np.array(data, dtype=object)
 
 def loadDataMemory(file, delimiter):
@@ -140,7 +143,7 @@ def computeStatistics(data, pkt=False):
     for row in data:
         st = [np.mean(row), np.amax(row), np.std(row), np.var(row)]
         statistics.append(st)
-    return statistics
+    return np.array(statistics)
 
 
 def saveStatistics(filename, delimiter, kems, data, fields=None):
@@ -157,10 +160,60 @@ def saveStatistics(filename, delimiter, kems, data, fields=None):
             writer.writerow(fields)
         writer.writerows(data)
 
+def barGraph(dictionary, kems, units, imageName, logy):
+    """
+    Uses matplotlib to plot data on a graph bar.
+    https://markhneedham.com/blog/2018/09/18/matplotlib-remove-axis-legend/
+    https://stackoverflow.com/questions/30228069/how-to-display-the-value-of-the-bar-on-each-bar-with-pyplot-barh
+    https://www.reddit.com/r/learnpython/comments/9l948p/having_a_bit_of_trouble_sorting_bars_in/
+    """
+    # Plot the performance of each cipher with a logarithmic scale
+    dfTFastest = pd.DataFrame(dictionary, index=kems)
+    fig, ax = plt.subplots()
+    dfTFastest.plot(kind="bar", ax=ax, rot=45, grid=True, logy=True)
+    plt.ylabel(units)
+    plt.tight_layout()
+    plt.savefig(imageName + ".svg")
+    plt.close()
+
+def plotStatisticsOnBarGraph(statistics, statisticsNames, fields, variable, kems, imageName, units, logy=False):
+    """
+    Plot all the statistics on a bar graph, and save the image to 'imageName'.
+    Inputs:
+        -statistics: array containing the statistics.
+        -statisticsName: name of each statistic.
+        -fields: array containing the name of the fields for each variable.
+        -variable: name of the variable under study.
+        -kems: name of the kem under study.
+        -imageName: name of the image to save.
+        -logy: logarithmic scale on y-axis?
+    Group by field, if necessary
+    """
+    for i in range(len(statisticsNames)):
+        df = {}
+        # Get the ith statistics
+        ithSt = statistics[:, i]
+        # Group by field
+        nFields = len(fields)
+        for j in range(nFields):
+            fieldStatistics = []
+            for k in range(len(kems)):
+                fieldStatistics.append(ithSt[j + (k * nFields)])
+            df[fields[j]] = fieldStatistics.copy()
+        barGraph(df, kems, unit, imageName + statisticsNames[i] , logy)
+
 
 if __name__ == '__main__':
-    #fields, unit, kem, data = loadDataCPUPerformance("CPUPerformance/cyclesCPUPerformance.csv", ',', 5)
-    #kem, data = loadDataMemory("memoryPerformance/memoryPerformance.csv", ',')
+    # For CPU performance
+    fields, unit, kem, data = loadDataCPUPerformance("CPUPerformance/cyclesCPUPerformance.csv", ',', 5)
+    statistics = computeStatistics(data)
+    plotStatisticsOnBarGraph(statistics, ["Mean", "Max", "SD", "Var"], fields, "CPU", kem, "images/cpuPerformance", unit, True)
+    saveStatistics("statistics/cpuStat.csv", ',', kem, statistics, fields)
+
+    # For memory performance
+    kem, data = loadDataMemory("memoryPerformance/memoryPerformance.csv", ',')
+    statistics = computeStatistics(data)
+    plotStatisticsOnBarGraph(statistics, ["Mean", "Max", "SD", "Var"], ["Memory"], "Memory", kem, "images/memoryPerformance", "bytes", True)
+    saveStatistics("statistics/memoryStat.csv", ',', kem, statistics)
+    # For packet performance
     kem, fields, kemData = loadDataPacket("packetsPerformance/packetPerformance.csv", ',')
-    statistics = computeStatistics(kemData)
-    saveStatistics("packetStt.csv", ',', kem, statistics, fields)
