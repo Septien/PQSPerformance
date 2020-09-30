@@ -125,7 +125,42 @@ def loadDataPacket(file, delimiter):
             i += 1
     return kem, fields, np.array(kemData)
 
+def computeStatistics(data, pkt=False):
+    """
+    Computes the statistics for each variable of interest. As each 
+    variable has different fields, and for each field the statistics 
+    are computed, it is needed to indicate the current variable.
+    Returns an array with statistics in the following order:
+        -Mean.
+        -Maximum.
+        -Standard Deviation.
+        -Variance.
+    """
+    statistics = []
+    for row in data:
+        st = [np.mean(row), np.amax(row), np.std(row), np.var(row)]
+        statistics.append(st)
+    return statistics
+
+
+def saveStatistics(filename, delimiter, kems, data, fields=None):
+    """
+    Save the statistics data on a file called 'filename', a csv file.
+    On the first row, the name of the kems will be stored. If the variable
+    has fields, the following road contains the name of them. On the
+    rest of the file, the statistics data are stored.
+    """
+    with open(filename, 'w') as file:
+        writer = csv.writer(file, delimiter=delimiter)
+        writer.writerow(kems)
+        if fields:
+            writer.writerow(fields)
+        writer.writerows(data)
+
+
 if __name__ == '__main__':
     #fields, unit, kem, data = loadDataCPUPerformance("CPUPerformance/cyclesCPUPerformance.csv", ',', 5)
     #kem, data = loadDataMemory("memoryPerformance/memoryPerformance.csv", ',')
     kem, fields, kemData = loadDataPacket("packetsPerformance/packetPerformance.csv", ',')
+    statistics = computeStatistics(kemData)
+    saveStatistics("packetStt.csv", ',', kem, statistics, fields)
