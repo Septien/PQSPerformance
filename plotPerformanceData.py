@@ -111,7 +111,7 @@ def loadDataPacket(file, delimiter):
         for row in reader:
             # Get the KEMs name
             if i % 10 == 0:
-                kem.append(row)
+                kem.append(row[0])
             # Get the number of packets
             if i % 10 == 1:
                 d = [int(r) for r in row]
@@ -142,7 +142,7 @@ def computeStatistics(data, pkt=False):
     statistics = []
     for row in data:
         st = [np.mean(row), np.amax(row), np.std(row), np.var(row)]
-        statistics.append(st)
+        statistics.append(st.copy())
     return np.array(statistics)
 
 
@@ -170,7 +170,7 @@ def barGraph(dictionary, kems, units, imageName, logy):
     # Plot the performance of each cipher with a logarithmic scale
     dfTFastest = pd.DataFrame(dictionary, index=kems)
     fig, ax = plt.subplots()
-    dfTFastest.plot(kind="bar", ax=ax, rot=45, grid=True, logy=True)
+    dfTFastest.plot(kind="bar", ax=ax, rot=45, grid=True, logy=logy)
     plt.ylabel(units)
     plt.tight_layout()
     plt.savefig(imageName + ".svg")
@@ -200,20 +200,68 @@ def plotStatisticsOnBarGraph(statistics, statisticsNames, fields, variable, kems
             for k in range(len(kems)):
                 fieldStatistics.append(ithSt[j + (k * nFields)])
             df[fields[j]] = fieldStatistics.copy()
-        barGraph(df, kems, unit, imageName + statisticsNames[i] , logy)
+        barGraph(df, kems, units, imageName + statisticsNames[i], logy)
 
+def linePlot(data, unit, fieldName, kems, imageName, logy=False):
+    """
+    Plot the data on a line graph.
+        -data: Arrays containing the data per field.
+        -unit: Unit of the field.
+        -field: Name of the field.
+        -kems: Name of the kems.
+        -imageName: Where to save the image.
+    """
+    # Create a dictionary with the data
+    dictD = {}
+    for i in range(len(data)):
+        dictD[kems[i]] = data[i]
+    df = pd.DataFrame(dictD, index=range(len(data[0])))
+    fig, ax = plt.subplots()
+    df.plot(kind="line", ax=ax, rot=0, grid=True, logy=logy)
+    plt.title(fieldName)
+    plt.ylabel(unit)
+    plt.tight_layout()
+    plt.savefig(imageName + unit + ".svg")
+    plt.close()
+
+def plotDataOnLinePlot(data, units, fields, kems, imageName, logy=False):
+    """
+    Separates the data by fields, and then pass it to a function to plot all the
+    data on a single graph.
+        -data: Arrays containing the performance data.
+        -units: Units of each field.
+        -fields: Name of the fields.
+        -kems: Name of the KEMs.
+        -imageName: Where to save the image.
+    """
+    # Get the number of fields
+    nFields = len(fields)
+    # Separate the data on fields
+    for i in range(nFields):
+        dataByFields = []
+        for j in range(len(kem)):
+            dataByFields.append(data[i + (nFields * j)])
+        linePlot(dataByFields, units[i], fields[i], kems, imageName + fields[i], logy)
 
 if __name__ == '__main__':
+    stats = ["Mean", "Max", "SD", "Var"]
     # For CPU performance
     fields, unit, kem, data = loadDataCPUPerformance("CPUPerformance/cyclesCPUPerformance.csv", ',', 5)
     statistics = computeStatistics(data)
-    plotStatisticsOnBarGraph(statistics, ["Mean", "Max", "SD", "Var"], fields, "CPU", kem, "images/cpuPerformance", unit, True)
+    plotStatisticsOnBarGraph(statistics, stats, fields, "CPU", kem, "images/cpuPerformance", unit, True)
+    plotDataOnLinePlot(data, [unit, unit, unit], fields, kem, "images/cpuUsage", True)
     saveStatistics("statistics/cpuStat.csv", ',', kem, statistics, fields)
 
     # For memory performance
     kem, data = loadDataMemory("memoryPerformance/memoryPerformance.csv", ',')
     statistics = computeStatistics(data)
-    plotStatisticsOnBarGraph(statistics, ["Mean", "Max", "SD", "Var"], ["Memory"], "Memory", kem, "images/memoryPerformance", "bytes", True)
+    plotStatisticsOnBarGraph(statistics, stats, ["Memory"], "Memory", kem, "images/memoryPerformance", "Bytes", True)
+    plotDataOnLinePlot(data, ["Bytes"], ["Memory"], kem, "images/memoryUsage", True)
     saveStatistics("statistics/memoryStat.csv", ',', kem, statistics)
+    
     # For packet performance
     kem, fields, kemData = loadDataPacket("packetsPerformance/packetPerformance.csv", ',')
+    statistics = computeStatistics(kemData)
+    plotStatisticsOnBarGraph(statistics, stats, fields, "Packets", kem, "images/packetPerformance", fields)
+    plotDataOnLinePlot(kemData, ["Packets", "Bytes", "mSec"], fields, kem, "images/packetUsage")
+    saveStatistics("statistics/packetStat.csv", ',', kem, statistics, fields)
