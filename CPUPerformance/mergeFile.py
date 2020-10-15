@@ -10,7 +10,7 @@ def mergeFiles(file, unit, delimiter):
     get the columns corresponding to 'unit' unit, and merge in 'file'.
     -unit: unit of performance. sec -> second, cyc -> cycles
     """
-    kem = ["ntrulpr653", "ntruhrss701", "ligthsaber", "kyber512", "frodoKEM640"]
+    kem = ["ligthsaber", "kyber512", "ntruhps2048509", "ntrulpr653", "frodoKEM640"]
     perf = "Performance"
     ext = ".csv"
     with open(unit + file, "w") as File:

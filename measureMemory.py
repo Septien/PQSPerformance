@@ -3,7 +3,7 @@ import csv
 import numpy as np
 
 folder = "memoryPerformance/"
-ciphers = ["NTRUP=1", "NTRU=1", "SABER=1", "KYBER=1", "FRODO=1"]
+ciphers = ["SABER=1", "KYBER=1", "NTRU=1", "NTRUP=1", "FRODO=1"]
 massiffile = ["ntrup/ntrup", "ntru/ntru", "saber/saber", "kyber/kyber", "frodo/frodo"]
 operation = ["TOTAL=1", "KEYGEN=1", "ENC=1", "DEC=1"]
 ext = ".out"
@@ -133,6 +133,6 @@ def saveData(data, file, delimiter, op=True):
         writer.writerows(mT)
 
 if __name__ == '__main__':
-    measureMemory()
+    #measureMemory()
     m = getMemoryUsageKEM()
-    saveData(m, "memoryPerformance.csv", ",", False)
+    saveData(m, "memoryPerformance/memoryPerformance.csv", ",", False)

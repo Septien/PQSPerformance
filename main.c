@@ -9,7 +9,7 @@
 
 // Crypto libraries
 #ifdef NTRU
-#include "ntru-hrss701/api.h"
+#include "ntru-hps2048509/api.h"
 #endif
 
 #ifdef NTRUP
