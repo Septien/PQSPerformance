@@ -243,6 +243,39 @@ def plotDataOnLinePlot(data, units, fields, kems, imageName, logy=False):
             dataByFields.append(data[i + (nFields * j)])
         linePlot(dataByFields, units[i], fields[i], kems, imageName + fields[i], logy)
 
+def plotDataOnBoxPlot(data, fields, kems, unit, imageName, logy=False):
+    """
+    Group all the data on by kems, and then plot it on a box plot, on a single graph.
+        -data: Arrays containing the data.
+        -units: Units of each field.
+        -fields: Name of the fields.
+        -kems: Name of the KEMs.
+        -imageName: Where to save the image.
+    """
+    kem1 = [data[0], data[1], data[2]]
+    kem2 = [data[3], data[4], data[5]]
+    kem3 = [data[6], data[7], data[8]]
+    kem4 = [data[9], data[10], data[11]]
+    kem5 = [data[12], data[13], data[14]]
+
+    #bpk1 = plt.boxplot(kem1, positions=[0,1,2], sym='', widths=0.6)
+    #bpk2 = plt.boxplot(kem2, positions=[3,4,5], sym='', widths=0.6)
+    bpk3 = plt.boxplot(kem3, positions=[6,7,8], sym='', widths=0.6)
+    bpk4 = plt.boxplot(kem4, positions=[9,10,11], sym='', widths=0.6)
+    #bpk5 = plt.boxplot(kem5, positions=[12,13,14], sym='', widths=0.6)
+
+    #plt.plot([], c='blue', label=kem[0])
+    #plt.plot([], c='red', label=kem[1])
+    plt.plot([], c='green', label=kem[2])
+    plt.plot([], c='yellow', label=kem[3])
+    #plt.plot([], c='magenta', label=kem[4])
+
+    plt.xticks([1, 4, 6], fields)
+    #plt.yscale('log')
+    plt.tight_layout()
+    plt.savefig(imageName)
+    plt.close()
+
 if __name__ == '__main__':
     stats = ["Mean", "Max", "SD", "Var"]
     # For CPU performance
@@ -250,6 +283,7 @@ if __name__ == '__main__':
     statistics = computeStatistics(data)
     plotStatisticsOnBarGraph(statistics, stats, fields, "CPU", kem, "images/cpuPerformance", unit, True)
     plotDataOnLinePlot(data, [unit, unit, unit], fields, kem, "images/cpuUsage", True)
+    plotDataOnBoxPlot(data, fields, kem, unit, "images/cpuBehaviour.svg", True)
     saveStatistics("statistics/cpuStat.csv", ',', kem, statistics, fields)
 
     # For memory performance
