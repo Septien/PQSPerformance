@@ -280,10 +280,10 @@ def plotDataOnBoxPlot(data, fields, kems, unit, imageName, logy=False):
 if __name__ == '__main__':
     stats = ["Mean", "Max", "SD", "Var"]
     # For CPU performance
-    fields, unit, kem, data = loadDataCPUPerformance("CPUPerformance/cyclesCPUPerformance.csv", ',', 5)
+    fields, unit, kem, data = loadDataCPUPerformance("CPUPerformance/timeCPUPerformance.csv", ',', 5)
     statistics = computeStatistics(data)
-    plotStatisticsOnBarGraph(statistics, stats, fields, "CPU", kem, "images/cpuPerformance", unit, True)
-    plotDataOnLinePlot(data, [unit, unit, unit], fields, kem, "images/cpuUsage", True)
+    plotStatisticsOnBarGraph(statistics, stats, fields, "CPU", kem, "images/cpuPerformance", "MicroSeconds", True)
+    plotDataOnLinePlot(data, ["MicroSeconds", "MicroSeconds", "MicroSeconds"], fields, kem, "images/cpuUsage", True)
     plotDataOnBoxPlot(data, fields, kem, unit, "images/cpuBehaviour.svg", True)
     saveStatistics("statistics/cpuStat.csv", ',', kem, statistics, fields)
 
