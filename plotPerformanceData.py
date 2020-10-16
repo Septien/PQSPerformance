@@ -160,7 +160,7 @@ def saveStatistics(filename, delimiter, kems, data, fields=None):
             writer.writerow(fields)
         writer.writerows(data)
 
-def barGraph(dictionary, kems, units, imageName, logy):
+def barGraph(dictionary, kems, units, imageName, statisticName, logy):
     """
     Uses matplotlib to plot data on a graph bar.
     https://markhneedham.com/blog/2018/09/18/matplotlib-remove-axis-legend/
@@ -172,6 +172,7 @@ def barGraph(dictionary, kems, units, imageName, logy):
     fig, ax = plt.subplots()
     dfTFastest.plot(kind="bar", ax=ax, rot=45, grid=True, logy=logy)
     plt.ylabel(units)
+    plt.title(statisticName)
     plt.tight_layout()
     plt.savefig(imageName + ".svg")
     plt.close()
@@ -200,7 +201,7 @@ def plotStatisticsOnBarGraph(statistics, statisticsNames, fields, variable, kems
             for k in range(len(kems)):
                 fieldStatistics.append(ithSt[j + (k * nFields)])
             df[fields[j]] = fieldStatistics.copy()
-        barGraph(df, kems, units, imageName + statisticsNames[i], logy)
+        barGraph(df, kems, units, imageName + statisticsNames[i], statisticsNames[i], logy)
 
 def linePlot(data, unit, fieldName, kems, imageName, logy=False):
     """
