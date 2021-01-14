@@ -28,7 +28,7 @@ def configStrings():
     # For the client
     client = "/home/pi/Documents/Maestria/client/client "
     # Send kill signal to the process with name client
-    kill = "kill -s signal $(ps -C client -o pid=)"
+    kill = "kill -9 $(ps -C client -o pid=)"
 
     for kem in kems:
         filename = kem + baseFilename
