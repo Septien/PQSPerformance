@@ -4,7 +4,7 @@
 import os
 import time
 
-def runClient(tshrkcmd, clientcmd, killcmd):
+def runClient(clientcmd, killcmd):
     """
     """
     os.system(clientcmd)
@@ -36,9 +36,9 @@ def configStrings():
         tsharkcmd = "sudo tshark " + interface + options + captureFRoute + filename + host + " &"
         clientcmd = client + kem + " &"
         # Execute tshark command
-        os.system(tshrkcmd)
+        os.system(tsharkcmd)
         for n in N:
-            runClient(tsharkcmd, clientcmd, kill)
+            runClient(clientcmd, kill)
         os.system(killtshark)
 
 if __name__ == '__main__':
