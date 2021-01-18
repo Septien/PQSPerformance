@@ -11,3 +11,5 @@ test
 /memory
 *.crt
 __pycache__/
+*.pcapng
+*.csv
