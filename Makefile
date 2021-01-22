@@ -58,6 +58,10 @@ ifdef MEMORY
 	endif
 endif
 
+ifdef RPI
+	CFLAGS += -DRPI
+endif
+
 $( info $(LIBFLAGS) )
 
 test: $(SOURCES) $(HEADERS)

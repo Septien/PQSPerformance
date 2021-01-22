@@ -13,7 +13,7 @@ def measurePerformance():
     folder = "CPUPerformance/"
     for i in range(len(ciphers)):
         os.system("rm test")
-        cmd = "make test " + ciphers[i] + " TIME=1"
+        cmd = "make test " + ciphers[i] + " TIME=1 RPI=1"
         os.system(cmd)
         output = folder + files[i] + perf
         cmd = "./test " + output
