@@ -37,7 +37,8 @@ def configStrings():
         clientcmd = client + kem + " &"
         # Execute tshark command
         os.system(tsharkcmd)
-        for n in N:
+        time.sleep(10)
+        for n in range(N):
             runClient(clientcmd, kill)
         os.system(killtshark)
 
