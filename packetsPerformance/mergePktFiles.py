@@ -23,8 +23,8 @@ def mergeFiles(outputfile, delimiter):
     Load the files containing the package data, gather the required fields (indicated on top),
     and save them on a single file.
     """
-    kems = ["kyber512", "frodoKEM640", "lightsaber", "ntruhrss701"]
-    packet = "Packet.csv"
+    kems = ["lightSaber", "p256", "ntru", "x25519"]
+    packet = ".csv"
     # Open the file containing the information
     with open(outputfile, "w") as out:
         writer = csv.writer(out, delimiter=delimiter)
