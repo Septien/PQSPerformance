@@ -20,7 +20,7 @@ def measureMemory():
             for k in range(1):
                 # Remove test binary
                 os.system(rm)
-                cmd = make + "test " + ciphers[i] + " MEMORY=1 DEBUG=1 " + operation[k]
+                cmd = make + "test " + ciphers[i] + " MEMORY=1 DEBUG=1 RPI=1" + operation[k]
                 os.system(cmd)
 
                 # Profile memory with valgrind
@@ -133,6 +133,6 @@ def saveData(data, file, delimiter, op=True):
         writer.writerows(mT)
 
 if __name__ == '__main__':
-    #measureMemory()
+    measureMemory()
     m = getMemoryUsageKEM()
     saveData(m, "memoryPerformance/memoryPerformance.csv", ",", False)
