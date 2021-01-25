@@ -4,17 +4,17 @@ import numpy as np
 
 folder = "memoryPerformance/"
 ciphers = ["SABER=1", "KYBER=1", "NTRU=1", "NTRUP=1", "FRODO=1"]
-massiffile = ["ntrup/ntrup", "ntru/ntru", "saber/saber", "kyber/kyber", "frodo/frodo"]
+massiffile = ["saber/saber", "kyber/kyber", "ntru/ntru", "ntrup/ntrup", "frodo/frodo"]
 operation = ["TOTAL=1", "KEYGEN=1", "ENC=1", "DEC=1"]
 ext = ".out"
 rm = "rm test"
 make = "make test "
 valgrind = "valgrind --tool=massif --stacks=yes --massif-out-file="
-N = 2000
+N = 1
 
 def measureMemory():
     # For each cipher, measure its memory consumption
-    for i in range(1):
+    for i in range(5):
         for j in range(N):
             # make with the memory option enabled, and desired operation
             for k in range(1):
@@ -104,10 +104,7 @@ def getMemoryUsageKEM():
     # For each kem
     totalValues = []
     for i in range(5):
-        if i == 0:
-            fileN = folder + massiffile[i] + "_TOTAL_0" + ext
-        else:
-            fileN = folder + massiffile[i] + "_0" + ext
+        fileN = folder + massiffile[i] + "_TOTAL_0" + ext
         values = []
         print(fileN)
         with open(fileN, "r") as file:
