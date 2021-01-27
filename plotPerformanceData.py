@@ -126,7 +126,7 @@ def loadDataPacket(file, delimiter):
                 kemData.append(d)
             
             i += 1
-    return kem, fields, np.array(kemData)
+    return kem, fields, np.array(kemData, dtype=object)
 
 def computeStatistics(data, pkt=False):
     """
@@ -282,21 +282,21 @@ if __name__ == '__main__':
     # For CPU performance
     fields, unit, kem, data = loadDataCPUPerformance("CPUPerformance/timeCPUPerformance.csv", ',', 5)
     statistics = computeStatistics(data)
-    plotStatisticsOnBarGraph(statistics, stats, fields, "CPU", kem, "images/cpuPerformance", "MicroSeconds", True)
-    plotDataOnLinePlot(data, ["MicroSeconds", "MicroSeconds", "MicroSeconds"], fields, kem, "images/cpuUsage", True)
-    plotDataOnBoxPlot(data, fields, kem, unit, "images/cpuBehaviour.svg", True)
-    saveStatistics("statistics/cpuStat.csv", ',', kem, statistics, fields)
+    plotStatisticsOnBarGraph(statistics, stats, fields, "CPU", kem, "images/cpuPerformanceRPI", "MicroSeconds", True)
+    plotDataOnLinePlot(data, ["MicroSeconds", "MicroSeconds", "MicroSeconds"], fields, kem, "images/cpuUsageRPI", True)
+    plotDataOnBoxPlot(data, fields, kem, unit, "images/cpuBehaviourRPI.svg", True)
+    saveStatistics("statistics/cpuStatRPI.csv", ',', kem, statistics, fields)
 
     # For memory performance
     kem, data = loadDataMemory("memoryPerformance/memoryPerformance.csv", ',')
     statistics = computeStatistics(data)
-    plotStatisticsOnBarGraph(statistics, stats, ["Memory"], "Memory", kem, "images/memoryPerformance", "Bytes", True)
-    plotDataOnLinePlot(data, ["Bytes"], ["Memory"], kem, "images/memoryUsage", True)
-    saveStatistics("statistics/memoryStat.csv", ',', kem, statistics)
+    plotStatisticsOnBarGraph(statistics, stats, ["Memory"], "Memory", kem, "images/memoryPerformanceRPI", "Bytes", True)
+    plotDataOnLinePlot(data, ["Bytes"], ["Memory"], kem, "images/memoryUsageRPI", True)
+    saveStatistics("statistics/memoryStatRPI.csv", ',', kem, statistics)
     
     # For packet performance
     kem, fields, kemData = loadDataPacket("packetsPerformance/packetPerformance.csv", ',')
     statistics = computeStatistics(kemData)
-    plotStatisticsOnBarGraph(statistics, stats, fields, "Packets", kem, "images/packetPerformance", fields)
-    plotDataOnLinePlot(kemData, ["Packets", "Bytes", "mSec"], fields, kem, "images/packetUsage")
-    saveStatistics("statistics/packetStat.csv", ',', kem, statistics, fields)
+    plotStatisticsOnBarGraph(statistics, stats, fields, "Packets", kem, "images/packetPerformanceRPI", fields)
+    plotDataOnLinePlot(kemData, ["Packets", "Bytes", "mSec"], fields, kem, "images/packetUsageRPI")
+    saveStatistics("statistics/packetStatPI.csv", ',', kem, statistics, fields)
