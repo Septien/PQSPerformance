@@ -16,7 +16,7 @@ def configStrings():
     """
     Set all the necessary configuration
     """
-    kems = ["lightsaber", "ntru_hps2048509", "P-256", " X25519"]
+    kems = ["kyber512", "lightsaber", "ntru_hps2048509", "P-256", " X25519"]
     # For tshark
     host = "host 13.65.102.222"
     interface = "-i eth0 "
