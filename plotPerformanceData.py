@@ -94,7 +94,6 @@ def loadDataPacket(file, delimiter):
     We currently are only interestedi in the following variables:
         -Number of bytes transmitted.
         -Duration of the connection.
-        -Number of packets sent.
     Returns the name of the fields, the name of the KEMs, and a 
     matrix of size (m * 3) * N, where m is the number of KEMS, 
     and N the number of runs.
@@ -106,16 +105,12 @@ def loadDataPacket(file, delimiter):
         reader = csv.reader(f, delimiter=delimiter)
         # Get the field information
         row = next(reader)
-        fields = [row[0], row[1], row[6]]
+        fields = [row[1], row[6]]
         i = 0
         for row in reader:
             # Get the KEMs name
             if i % 10 == 0:
                 kem.append(row[0])
-            # Get the number of packets
-            if i % 10 == 1:
-                d = [int(r) for r in row]
-                kemData.append(d)
             # Get the number of bytes
             if i % 10 == 2:
                 d = [int(r) for r in row]
@@ -177,7 +172,7 @@ def barGraph(dictionary, kems, units, imageName, statisticName, logy):
     plt.savefig(imageName + ".svg")
     plt.close()
 
-def plotStatisticsOnBarGraph(statistics, statisticsNames, fields, variable, kems, imageName, units, logy=False):
+def plotStatisticsOnBarGraph(statistics, statisticsNames, fields, variable, kems, imageName, units, logy=False, byField=False):
     """
     Plot all the statistics on a bar graph, and save the image to 'imageName'.
     Inputs:
@@ -201,7 +196,11 @@ def plotStatisticsOnBarGraph(statistics, statisticsNames, fields, variable, kems
             for k in range(len(kems)):
                 fieldStatistics.append(ithSt[j + (k * nFields)])
             df[fields[j]] = fieldStatistics.copy()
-        barGraph(df, kems, units, imageName + statisticsNames[i], statisticsNames[i], logy)
+        if byField:
+            for j in range(len(fields)):
+                barGraph({fields[j]: df[fields[j]]}, kems, units[j], imageName + statisticsNames[i] + fields[j], statisticsNames[i], logy)
+        else:
+            barGraph(df, kems, units, imageName + statisticsNames[i], statisticsNames[i], logy)
 
 def linePlot(data, unit, fieldName, kems, imageName, logy=False):
     """
@@ -297,6 +296,6 @@ if __name__ == '__main__':
     # For packet performance
     kem, fields, kemData = loadDataPacket("packetsPerformance/packetPerformance.csv", ',')
     statistics = computeStatistics(kemData)
-    plotStatisticsOnBarGraph(statistics, stats, fields, "Packets", kem, "images/packetPerformanceRPI", fields)
-    plotDataOnLinePlot(kemData, ["Packets", "Bytes", "mSec"], fields, kem, "images/packetUsageRPI")
+    plotStatisticsOnBarGraph(statistics, stats, fields, "Packets", kem, "images/packetPerformanceRPI", fields, False, True)
+    plotDataOnLinePlot(kemData, ["Bytes", "Sec"], fields, kem, "images/packetUsageRPI")
     saveStatistics("statistics/packetStatPI.csv", ',', kem, statistics, fields)
