@@ -116,8 +116,8 @@ def loadDataPacket(file, delimiter):
                 d = [int(r) for r in row]
                 kemData.append(d)
             # Get the duration of the connection
-            if i % 10 == 6:
-                d = [int(r) for r in row]
+            if i % 10 == 7:
+                d = [float(r) for r in row]
                 kemData.append(d)
             
             i += 1
@@ -220,6 +220,7 @@ def linePlot(data, unit, fieldName, kems, imageName, logy=False):
     df.plot(kind="line", ax=ax, rot=0, grid=True, logy=logy)
     plt.title(fieldName)
     plt.ylabel(unit)
+    plt.xlabel("Iteration")
     plt.tight_layout()
     plt.savefig(imageName + unit + ".svg")
     plt.close()
@@ -296,6 +297,6 @@ if __name__ == '__main__':
     # For packet performance
     kem, fields, kemData = loadDataPacket("packetsPerformance/packetPerformance.csv", ',')
     statistics = computeStatistics(kemData)
-    plotStatisticsOnBarGraph(statistics, stats, fields, "Packets", kem, "images/packetPerformanceRPI", fields, False, True)
-    plotDataOnLinePlot(kemData, ["Bytes", "Sec"], fields, kem, "images/packetUsageRPI")
-    saveStatistics("statistics/packetStatPI.csv", ',', kem, statistics, fields)
+    plotStatisticsOnBarGraph(statistics, stats, fields, "Packets", kem, "images/packetPerformanceRPI", ["Bytes", "mSec"], False, True)
+    plotDataOnLinePlot(kemData, ["Bytes", "mSec"], fields, kem, "images/packetUsageRPI")
+    saveStatistics("statistics/packetStatRPI.csv", ',', kem, statistics, fields)
