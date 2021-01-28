@@ -1,0 +1,2 @@
+"Address A","Port A","Address B","Port B","Packets","Bytes","Packets A → B","Bytes A → B","Packets B → A","Bytes B → A","Rel Start","Duration","Bits/s A → B","Bits/s B → A"
+"192.168.1.104",35990,"13.65.102.222",8883,8,4378,4,1306,4,3072,0,0.224646532,46508.61914930429,109398.52835119663
