@@ -105,12 +105,16 @@ def loadDataPacket(file, delimiter):
         reader = csv.reader(f, delimiter=delimiter)
         # Get the field information
         row = next(reader)
-        fields = [row[1], row[6]]
+        fields = [row[0], row[1], row[6]]
         i = 0
         for row in reader:
             # Get the KEMs name
             if i % 10 == 0:
                 kem.append(row[0])
+            # Get the number of packets transmitted
+            if i % 10 == 1:
+                d = [int(r) for r in row]
+                kemData.append(d)
             # Get the number of bytes
             if i % 10 == 2:
                 d = [int(r) for r in row]
@@ -278,7 +282,7 @@ def plotDataOnBoxPlot(data, fields, kems, unit, imageName, logy=False):
     plt.close()
 
 if __name__ == '__main__':
-    stats = ["Mean", "Max", "SD", "Var"]
+    stats = ["Mean", "Maximum", "Standard Deviation", "Variance"]
     # For CPU performance
     fields, unit, kem, data = loadDataCPUPerformance("CPUPerformance/timeCPUPerformance.csv", ',', 5)
     statistics = computeStatistics(data)
@@ -297,6 +301,6 @@ if __name__ == '__main__':
     # For packet performance
     kem, fields, kemData = loadDataPacket("packetsPerformance/packetPerformance.csv", ',')
     statistics = computeStatistics(kemData)
-    plotStatisticsOnBarGraph(statistics, stats, fields, "Packets", kem, "images/packetPerformanceRPI", ["Bytes", "mSec"], False, True)
-    plotDataOnLinePlot(kemData, ["Bytes", "mSec"], fields, kem, "images/packetUsageRPI")
+    plotStatisticsOnBarGraph(statistics, stats, fields, "Packets", kem, "images/packetPerformanceRPI", ["Packets", "Bytes", "mSec"], False, True)
+    plotDataOnLinePlot(kemData, ["Packets", "Bytes", "mSec"], fields, kem, "images/packetUsageRPI")
     saveStatistics("statistics/packetStatRPI.csv", ',', kem, statistics, fields)
