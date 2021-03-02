@@ -170,6 +170,7 @@ def barGraph(dictionary, kems, units, imageName, statisticName, logy):
     dfTFastest = pd.DataFrame(dictionary, index=kems)
     fig, ax = plt.subplots()
     dfTFastest.plot(kind="bar", ax=ax, rot=45, grid=True, logy=logy)
+    ax.set_axisbelow(True)
     plt.ylabel(units)
     plt.title(statisticName)
     plt.tight_layout()
