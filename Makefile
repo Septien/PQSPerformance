@@ -47,15 +47,6 @@ endif
 
 ifdef MEMORY
 	CFLAGS += -DMEMORY
-	ifdef KEYGEN
-		CFLAGS += -DKEYGEN
-	endif
-	ifdef ENC
-		CFLAGS += -DENC
-	endif
-	ifdef DEC
-		CFLAGS += -DDEC
-	endif
 endif
 
 ifdef RPI
