@@ -122,7 +122,7 @@ def saveData(data, file, delimiter, op=True):
     mT = m.transpose()
     with open(file, "w") as csvfile:
         writer = csv.writer(csvfile, delimiter=delimiter)
-        cipherS = [c.split("=")[0] for c in ciphers]
+        cipherS = ["LightSaber", "Kyber512", "NTRUhps2048509", "NTRULPr653", "Frodo640"]
         writer.writerow(cipherS)
         if op:
             operationS = [c.split("=")[0] for c in operation]
@@ -130,6 +130,6 @@ def saveData(data, file, delimiter, op=True):
         writer.writerows(mT)
 
 if __name__ == '__main__':
-    measureMemory()
+    #measureMemory()
     m = getMemoryUsageKEM()
     saveData(m, "memoryPerformance/memoryPerformance.csv", ",", False)

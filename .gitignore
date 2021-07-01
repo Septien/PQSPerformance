@@ -12,4 +12,3 @@ test
 *.crt
 __pycache__/
 *.pcapng
-*.csv

@@ -94,7 +94,6 @@ def loadDataPacket(file, delimiter):
     We currently are only interestedi in the following variables:
         -Number of bytes transmitted.
         -Duration of the connection.
-        -Number of packets sent.
     Returns the name of the fields, the name of the KEMs, and a 
     matrix of size (m * 3) * N, where m is the number of KEMS, 
     and N the number of runs.
@@ -112,7 +111,7 @@ def loadDataPacket(file, delimiter):
             # Get the KEMs name
             if i % 10 == 0:
                 kem.append(row[0])
-            # Get the number of packets
+            # Get the number of packets transmitted
             if i % 10 == 1:
                 d = [int(r) for r in row]
                 kemData.append(d)
@@ -121,8 +120,8 @@ def loadDataPacket(file, delimiter):
                 d = [int(r) for r in row]
                 kemData.append(d)
             # Get the duration of the connection
-            if i % 10 == 6:
-                d = [int(r) for r in row]
+            if i % 10 == 7:
+                d = [float(r) for r in row]
                 kemData.append(d)
             
             i += 1
@@ -171,13 +170,14 @@ def barGraph(dictionary, kems, units, imageName, statisticName, logy):
     dfTFastest = pd.DataFrame(dictionary, index=kems)
     fig, ax = plt.subplots()
     dfTFastest.plot(kind="bar", ax=ax, rot=45, grid=True, logy=logy)
+    ax.set_axisbelow(True)
     plt.ylabel(units)
     plt.title(statisticName)
     plt.tight_layout()
     plt.savefig(imageName + ".svg")
     plt.close()
 
-def plotStatisticsOnBarGraph(statistics, statisticsNames, fields, variable, kems, imageName, units, logy=False):
+def plotStatisticsOnBarGraph(statistics, statisticsNames, fields, variable, kems, imageName, units, logy=False, byField=False):
     """
     Plot all the statistics on a bar graph, and save the image to 'imageName'.
     Inputs:
@@ -201,7 +201,11 @@ def plotStatisticsOnBarGraph(statistics, statisticsNames, fields, variable, kems
             for k in range(len(kems)):
                 fieldStatistics.append(ithSt[j + (k * nFields)])
             df[fields[j]] = fieldStatistics.copy()
-        barGraph(df, kems, units, imageName + statisticsNames[i], statisticsNames[i], logy)
+        if byField:
+            for j in range(len(fields)):
+                barGraph({fields[j]: df[fields[j]]}, kems, units[j], imageName + statisticsNames[i] + fields[j], statisticsNames[i], logy)
+        else:
+            barGraph(df, kems, units, imageName + statisticsNames[i], statisticsNames[i], logy)
 
 def linePlot(data, unit, fieldName, kems, imageName, logy=False):
     """
@@ -221,6 +225,7 @@ def linePlot(data, unit, fieldName, kems, imageName, logy=False):
     df.plot(kind="line", ax=ax, rot=0, grid=True, logy=logy)
     plt.title(fieldName)
     plt.ylabel(unit)
+    plt.xlabel("Iteration")
     plt.tight_layout()
     plt.savefig(imageName + unit + ".svg")
     plt.close()
@@ -278,7 +283,7 @@ def plotDataOnBoxPlot(data, fields, kems, unit, imageName, logy=False):
     plt.close()
 
 if __name__ == '__main__':
-    stats = ["Mean", "Max", "SD", "Var"]
+    stats = ["Mean", "Maximum", "Standard Deviation", "Variance"]
     # For CPU performance
     fields, unit, kem, data = loadDataCPUPerformance("CPUPerformance/timeCPUPerformance.csv", ',', 5)
     statistics = computeStatistics(data)
@@ -297,6 +302,6 @@ if __name__ == '__main__':
     # For packet performance
     kem, fields, kemData = loadDataPacket("packetsPerformance/packetPerformance.csv", ',')
     statistics = computeStatistics(kemData)
-    plotStatisticsOnBarGraph(statistics, stats, fields, "Packets", kem, "images/packetPerformanceRPI", fields)
+    plotStatisticsOnBarGraph(statistics, stats, fields, "Packets", kem, "images/packetPerformanceRPI", ["Packets", "Bytes", "mSec"], False, True)
     plotDataOnLinePlot(kemData, ["Packets", "Bytes", "mSec"], fields, kem, "images/packetUsageRPI")
-    saveStatistics("statistics/packetStatPI.csv", ',', kem, statistics, fields)
+    saveStatistics("statistics/packetStatRPI.csv", ',', kem, statistics, fields)
